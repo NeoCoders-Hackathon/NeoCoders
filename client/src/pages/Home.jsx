@@ -1,11 +1,15 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { ShoppingCart, Users, Star } from 'lucide-react';
 
-const Home = ({ user }) => {
+const Home = () => {
+  const location = useLocation();
+  const user = location.state?.user || JSON.parse(localStorage.getItem('user'));
+
   return (
     <div className="p-6 min-h-screen bg-gray-900 text-white">
       <h1 className="text-2xl font-bold mb-6">
-        Welcome, {user?.name || 'User'}!
+        Welcome, {user?.firstName || 'User'}!
       </h1>
 
       {/* Stats */}

@@ -13,10 +13,20 @@ import Sidebar from './components/Sidebar';
 import './App.css';
 
 function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
-  const handleLogin = (userData) => setUser(userData);
-  const handleLogout = () => setUser(null);
+  const handleLogin = (userData) => {
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('user');
+  };
 
   return (
     <BrowserRouter>
@@ -35,7 +45,7 @@ function App() {
 
             <main className="flex-1 overflow-auto p-4 bg-gray-100 dark:bg-gray-900">
               <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<Home user={user} />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/products" element={<Products />} />
                 <Route path="/notifications" element={<Notifications />} />

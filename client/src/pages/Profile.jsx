@@ -16,7 +16,7 @@ const Profile = () => {
 
   const today = new Date().toLocaleDateString("en-GB");
 
- 
+
   useEffect(() => {
     const saved = localStorage.getItem("profileData");
     const defaultProfile = {
@@ -30,6 +30,17 @@ const Profile = () => {
       wishlist: 4,
       image: "https://via.placeholder.com/150/6366f1/ffffff?text=AB",
     };
+
+    useEffect(() => {
+      const saved = localStorage.getItem("user");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setProfile(parsed);
+        setPreviewImage(parsed.image || "https://via.placeholder.com/150/6366f1/ffffff?text=AB");
+      }
+      setLoading(false);
+    }, []);
+
 
     if (saved) {
       const parsed = JSON.parse(saved);
@@ -78,8 +89,8 @@ const Profile = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800 p-6">
       <div className="bg-[#1e1e3f] text-white p-6 rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col gap-6">
-        
-   
+
+
         <div className="flex items-center gap-6">
           <div className="relative w-28 h-28">
             <img src={previewImage} alt="Profile" className="w-full h-full rounded-full object-cover border-2 border-violet-500 shadow-md" />
@@ -116,7 +127,7 @@ const Profile = () => {
           <div className="bg-[#3a3a65] rounded-xl p-4 text-center shadow-md"><Heart className="w-5 h-5 mx-auto mb-1" />{profile.wishlist}</div>
         </div>
 
-    
+
         {isEditing && (
           <div className="flex gap-3 mt-4">
             <button onClick={() => saveChanges(profile.name)} className="flex-1 px-4 py-2 bg-green-600 rounded-lg">Save</button>
