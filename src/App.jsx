@@ -2,15 +2,31 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import Header from './components/Header'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-   <div className='text-5xl  text-yellow-500'>
-    hello world
+  <Header />
+    // <BrowserRouter>
+    //   {/* Navbar */}
+    //   <nav className="flex gap-4 p-4 bg-gray-900 text-white">
+    //     <Link to="/">Home</Link>
+    //     <Link to="/profile">Profile</Link>
+    //     <Link to="/login">Login</Link>
+    //   </nav>
+
+    //   {/* Router Pages */}
+    //   <Routes>
+    //     <Route path="/" element={<Home />} />
+    //     <Route path="/profile" element={<Profile />} />
+    //     <Route path="/login" element={<Login />} />
+    //   </Routes>
+    // </BrowserRouter>
+  );
+   <div>
+    <Header />
    </div>
-  )
+  
 }
 
-export default App
+export default App;

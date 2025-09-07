@@ -1,8 +1,12 @@
 import React from 'react'
-
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import Profile from "../pages/Profile";
+import Home from "../pages/Home";
+import Login from "./pages/Login";
 const Header = () => {
   return (
     <div>
+  <BrowserRouter>
         <div className="navbar bg-base-100 shadow-sm">
   <div className="flex-1">
     <a className="btn btn-ghost text-xl">NeoCoders</a>
@@ -26,13 +30,19 @@ const Header = () => {
             <span className="badge">New</span>
           </a>
         </li>
-      <li> <Link to="/">Home</Link></li>
-        <li> <Link to="/">Home</Link></li>
-       <li> <Link to="/login">Login</Link></li>
+        <li><Link to="/">home</Link></li>
+        <li><Link to="/profile">Profile</Link></li>
+        <li><Link to="/login">Login</Link></li>
       </ul>
     </div>
   </div>
 </div>
+<Routes>
+     <Route path="/" element={<Home />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/login" element={<Login />} />
+</Routes>
+  </BrowserRouter>
     </div>
   )
 }
