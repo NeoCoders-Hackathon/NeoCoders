@@ -12,6 +12,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.9.0",
     "@tailwindcss/vite": "^4.1.13",
+    "axios": "^1.11.0",
     "daisyui": "^5.1.7",
     "localforage": "^1.10.0",
     "lucide-react": "^0.542.0",
