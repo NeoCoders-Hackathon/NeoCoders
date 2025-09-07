@@ -2,7 +2,8 @@ import React from 'react'
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Profile from "../pages/Profile";
 import Home from "../pages/Home";
-import Login from "./pages/Login";
+import Login from "../pages/Login";
+import Product from '../pages/Product';
 const Header = () => {
   return (
     <div>
@@ -24,15 +25,10 @@ const Header = () => {
       <ul
         tabIndex={0}
         className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-        <li>
-          <a className="justify-between">
-            Profile
-            <span className="badge">New</span>
-          </a>
-        </li>
         <li><Link to="/">home</Link></li>
         <li><Link to="/profile">Profile</Link></li>
         <li><Link to="/login">Login</Link></li>
+        <li><Link to="/product">Products</Link></li>
       </ul>
     </div>
   </div>
@@ -41,6 +37,7 @@ const Header = () => {
      <Route path="/" element={<Home />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/product" element={<Product />} />
 </Routes>
   </BrowserRouter>
     </div>
