@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Pencil, Trash, Plus } from 'lucide-react';
-
+import { FaRegHeart } from "react-icons/fa6";
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -100,7 +100,10 @@ const Products = () => {
                 )}
                 <h2 className="font-semibold text-lg">{product.title}</h2>
                 <p className="text-gray-600 mb-2">{product.description}</p>
+                <div>
                 <p className="text-gray-800 font-medium mb-3">${product.price}</p>
+                <FaRegHeart />
+                </div>
                 <div className="flex gap-2 mt-auto">
                   <button
                     onClick={() => handleEditProduct(product)}
