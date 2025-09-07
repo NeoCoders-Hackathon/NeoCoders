@@ -35,16 +35,9 @@ const Register = () => {
 
     setIsLoading(true);
     try {
-      // React + backend to'liq ishlashi uchun localhost yoki LAN IP ishlatish
       const res = await axios.post(
-        "http://100.8192.168.5:5000/api/auth/register/user",
-        {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          password: formData.password,
-          role: "customer",
-        }
+        "http://192.168.100.85:5000/api/auth/register/user", // backend bilan mos URL
+        formData
       );
 
       console.log("✅ Registration success:", res.data);
@@ -53,7 +46,7 @@ const Register = () => {
       if (res.data.token) localStorage.setItem("token", res.data.token);
       if (res.data.user) localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      navigate("/"); // asosiy sahifaga o'tish
+      navigate("/"); // asosiy sahifaga
     } catch (err) {
       console.error("❌ Registration error:", err);
       setError(err.response?.data?.message || "Server error");
@@ -72,7 +65,6 @@ const Register = () => {
           </div>
         )}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* First Name */}
           <div className="relative">
             <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-violet-400" />
             <input
@@ -85,8 +77,6 @@ const Register = () => {
               required
             />
           </div>
-
-          {/* Last Name */}
           <div className="relative">
             <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-violet-400" />
             <input
@@ -99,8 +89,6 @@ const Register = () => {
               required
             />
           </div>
-
-          {/* Email */}
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-violet-400" />
             <input
@@ -113,8 +101,6 @@ const Register = () => {
               required
             />
           </div>
-
-          {/* Password */}
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-violet-400" />
             <input
@@ -129,16 +115,16 @@ const Register = () => {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+            >
               {showPassword ? <EyeOff /> : <Eye />}
             </button>
           </div>
-
-          {/* Submit */}
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-2 bg-gradient-to-r from-violet-600 to-purple-600 rounded-lg text-white font-semibold">
+            className="w-full py-2 bg-gradient-to-r from-violet-600 to-purple-600 rounded-lg text-white font-semibold"
+          >
             {isLoading ? "Registering..." : "Register"}
           </button>
         </form>
