@@ -1,142 +1,227 @@
 import React, { useEffect, useState } from "react";
-import { PencilLine, Check, X, MapPin, Calendar, Heart, Phone, Camera } from "lucide-react";
-
-const Loading = () => (
-  <div className="flex flex-col items-center justify-center space-y-4">
-    <div className="w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
-    <p className="text-white text-lg font-medium">Loading profile...</p>
-  </div>
-);
+import axios from "axios";
+import { Pencil } from "lucide-react";
 
 const Profile = () => {
-  const [profile, setProfile] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [previewImage, setPreviewImage] = useState(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    image: "",
+    imageFile: null,
+  });
 
-  const today = new Date().toLocaleDateString("en-GB");
-
+  // User ma'lumotlarini olish
   useEffect(() => {
-    const saved = localStorage.getItem("profileData");
-    const defaultProfile = {
-      id: 1,
-      name: "Abror Bakhromov",
-      email: "Bakhromovv@gmail.com",
-      role: "admin",
-      phone: "+998 95 210 05 50",
-      address: "Tashkent, Uzbekistan",
-      createdAt: today,
-      wishlist: 4,
-      image: "https://via.placeholder.com/150/6366f1/ffffff?text=AB",
-    };
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("Siz login qilmagansiz");
 
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      setProfile(parsed);
-      setPreviewImage(parsed.image || defaultProfile.image);
+        const res = await axios.get("http://192.168.100.85:5000/api/user/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const userData = res.data.user || res.data;
+        setUser(userData);
+        setFormData({
+          firstName: userData.firstName || "",
+          lastName: userData.lastName || "",
+          image: userData.image || "",
+          imageFile: null,
+        });
+      } catch (err) {
+        console.log(err.response);
+        setError(err.response?.data?.message || err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  // Form inputlarni o'zgartirish
+  const handleChange = (e) => {
+    if (e.target.name === "imageFile") {
+      setFormData({ ...formData, imageFile: e.target.files[0] });
     } else {
-      setProfile(defaultProfile);
-      setPreviewImage(defaultProfile.image);
-      localStorage.setItem("profileData", JSON.stringify(defaultProfile));
+      setFormData({ ...formData, [e.target.name]: e.target.value });
     }
+  };
 
-    setTimeout(() => setLoading(false), 800);
-  }, [today]);
+  // Formani saqlash
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Siz login qilmagansiz");
 
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file || !file.type.startsWith("image/")) return;
+      let updateData;
 
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setPreviewImage(ev.target.result);
-      setIsEditing(true);
+      if (formData.imageFile) {
+        // Rasm bilan yuborish
+        const fileData = new FormData();
+        fileData.append("image", formData.imageFile);
+        fileData.append("firstName", formData.firstName);
+        fileData.append("lastName", formData.lastName);
+
+        const res = await axios.put(
+          `http://192.168.100.85:5000/api/user/update/${user._id}`,
+          fileData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        updateData = res.data.user;
+      } else {
+        // Faqat matn ma'lumotlari
+        const res = await axios.put(
+          `http://192.168.100.85:5000/api/user/update/${user._id}`,
+          {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        updateData = res.data.user;
+      }
+
+      setUser(updateData);
+      setIsEditing(false);
+    } catch (err) {
+      console.log(err.response);
+      setError(err.response?.data?.message || err.message);
+    }
+  };
+
+  // Rasm URLini tozalash (memory leak oldini olish)
+  useEffect(() => {
+    return () => {
+      if (formData.imageFile) URL.revokeObjectURL(formData.imageFile);
     };
-    reader.readAsDataURL(file);
-  };
+  }, [formData.imageFile]);
 
-  const saveChanges = (newName) => {
-    if (!newName.trim()) return;
-    const updated = { ...profile, name: newName.trim(), image: previewImage };
-    setProfile(updated);
-    localStorage.setItem("profileData", JSON.stringify(updated));
-    setIsEditing(false);
-  };
-
-  const cancelChanges = () => {
-    setPreviewImage(profile.image);
-    setIsEditing(false);
-  };
-
-  if (loading || !profile) {
+  // Loading va xatolarni ko'rsatish
+  if (loading)
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800">
-        <Loading />
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-violet-500 border-b-4 border-gray-700"></div>
       </div>
     );
-  }
+
+  if (error)
+    return (
+      <p className="text-red-500 text-center mt-10 text-lg font-semibold">
+        {error}
+      </p>
+    );
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800 p-6">
-      <div className="bg-[#1e1e3f] text-white p-6 rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col gap-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900  to-gray-900 p-4">
+      <div className="max-w-md w-full bg-[#1e1e3f] p-6 rounded-3xl shadow-2xl relative overflow-hidden">
+        {/* Edit button */}
+        <button
+          onClick={() => setIsEditing(!isEditing)}
+          className="absolute top-4 right-4 bg-violet-600 p-2 rounded-full shadow-lg hover:bg-violet-700 transition"
+        >
+          <Pencil className="w-5 h-5 text-white" />
+        </button>
 
-        {/* Profil rasmi */}
-        <div className="flex items-center gap-6">
-          <div className="relative w-28 h-28">
-            <img
-              src={previewImage}
-              alt="Profile"
-              className="w-full h-full rounded-full object-cover border-2 border-violet-500 shadow-md"
-            />
-            <label className="absolute bottom-0 right-0 bg-violet-600 p-2 rounded-full cursor-pointer">
-              <Camera className="w-4 h-4" />
-              <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
-            </label>
-          </div>
-
-          <div className="space-y-2 flex-1">
-            {isEditing ? (
+        {/* Profile rasm + name */}
+        <div className="flex items-center gap-4 mb-6">
+          <div className="relative w-24 h-24">
+            {isEditing && (
               <input
-                type="text"
-                defaultValue={profile.name}
-                onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                className="px-3 py-2 rounded-lg bg-[#3a3a65] text-white w-full"
+                type="file"
+                name="imageFile"
+                accept="image/*"
+                onChange={handleChange}
+                className="w-full h-full rounded-full border-2 border-violet-500/50 cursor-pointer opacity-0 absolute top-0 left-0 z-10"
               />
-            ) : (
-              <h2 className="text-2xl font-bold flex items-center gap-2">
-                {profile.name}
-                <PencilLine className="w-5 h-5 cursor-pointer" onClick={() => setIsEditing(true)} />
-              </h2>
             )}
-            <p>📧 {profile.email}</p>
-            <p>🛡 Role: {profile.role}</p>
-            <p>🆔 ID: {profile.id}</p>
+            <img
+              src={
+                formData.imageFile
+                  ? URL.createObjectURL(formData.imageFile)       // Tanlangan rasm
+                  : formData.image
+                    ? `http://192.168.100.85:5000/uploads/${formData.image}` // Serverdagi rasm
+                    : "/default-profile.png"                         // Default rasm
+              }
+              alt="Profile"
+              className="w-24 h-24 rounded-full border-2 border-violet-500/50 object-cover shadow-lg"
+            />
+
+          </div>
+
+          <div className="flex flex-col gap-2 flex-1">
+            {isEditing ? (
+              <>
+                <input
+                  type="text"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  className="bg-[#3a3a65] text-white px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 transition"
+                  placeholder="First Name"
+                />
+                <input
+                  type="text"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  className="bg-[#3a3a65] text-white px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 transition"
+                  placeholder="Last Name"
+                />
+                <button
+                  onClick={handleSave}
+                  className="mt-3 bg-violet-600 px-4 py-2 rounded-lg text-white hover:bg-violet-700 shadow-lg transition"
+                >
+                  Save
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-2xl font-bold text-white">
+                  {user.firstName}
+                </p>
+                <p className="text-xl text-gray-300">{user.lastName}</p>
+              </>
+            )}
           </div>
         </div>
 
-        {/* Qo‘shimcha ma’lumotlar */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-[#3a3a65] rounded-xl p-4 text-center shadow-md">
-            <Phone className="w-5 h-5 mx-auto mb-1" />{profile.phone}
-          </div>
-          <div className="bg-[#3a3a65] rounded-xl p-4 text-center shadow-md">
-            <MapPin className="w-5 h-5 mx-auto mb-1" />{profile.address}
-          </div>
-          <div className="bg-[#3a3a65] rounded-xl p-4 text-center shadow-md">
-            <Calendar className="w-5 h-5 mx-auto mb-1" />{profile.createdAt}
-          </div>
-          <div className="bg-[#3a3a65] rounded-xl p-4 text-center shadow-md">
-            <Heart className="w-5 h-5 mx-auto mb-1" />{profile.wishlist}
-          </div>
+        {/* Email */}
+        <div className="mt-3 hover:bg-gray-800 p-3 rounded-lg shadow-inner transition">
+          <p className="text-gray-400 text-sm">Email:</p>
+          <p className="text-white font-medium">{user.email}</p>
         </div>
 
-        {/* Tugmalar */}
-        {isEditing && (
-          <div className="flex gap-3 mt-4">
-            <button onClick={() => saveChanges(profile.name)} className="flex-1 px-4 py-2 bg-green-600 rounded-lg">Save</button>
-            <button onClick={cancelChanges} className="flex-1 px-4 py-2 bg-red-600 rounded-lg">Cancel</button>
-          </div>
-        )}
+        {/* Role */}
+        <div className="mt-3 hover:bg-gray-800 p-3 rounded-lg shadow-inner transition">
+          <p className="text-gray-400 text-sm">Role:</p>
+          <p className="text-white font-medium">{user.role}</p>
+        </div>
+
+        {/* Orders */}
+        <div className="mt-3 hover:bg-gray-800 p-3 rounded-lg shadow-inner transition">
+          <p className="text-gray-400 text-sm">Orders:</p>
+          {user.orders && user.orders.length > 0 ? (
+            <ul className="list-disc list-inside text-white">
+              {user.orders.map((order, i) => (
+                <li key={i}>{order}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-white font-medium">No orders yet</p>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -23,12 +23,8 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (
-      !formData.firstName ||
-      !formData.lastName ||
-      !formData.email ||
-      !formData.password
-    ) {
+    // Validatsiya
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
       setError("All fields are required");
       return;
     }
@@ -39,8 +35,9 @@ const Register = () => {
 
     setIsLoading(true);
     try {
+      // React + backend to'liq ishlashi uchun localhost yoki LAN IP ishlatish
       const res = await axios.post(
-        "http://192.168.1.104:5000/api/auth/register/user",
+        "http://100.8192.168.5:5000/api/auth/register/user",
         {
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -52,16 +49,11 @@ const Register = () => {
 
       console.log("✅ Registration success:", res.data);
 
-      // Backend token va user yuborsa localStorage ga saqlaymiz
-      if (res.data.token) {
-        localStorage.setItem("token", res.data.token);
-      }
-      if (res.data.user) {
-        localStorage.setItem("user", JSON.stringify(res.data.user));
-      }
+      // Token va user localStorage ga saqlash
+      if (res.data.token) localStorage.setItem("token", res.data.token);
+      if (res.data.user) localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      // Endi asosiy sahifaga o'tamiz
-      navigate("/");
+      navigate("/"); // asosiy sahifaga o'tish
     } catch (err) {
       console.error("❌ Registration error:", err);
       setError(err.response?.data?.message || "Server error");
@@ -80,6 +72,7 @@ const Register = () => {
           </div>
         )}
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* First Name */}
           <div className="relative">
             <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-violet-400" />
             <input
@@ -92,6 +85,8 @@ const Register = () => {
               required
             />
           </div>
+
+          {/* Last Name */}
           <div className="relative">
             <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-violet-400" />
             <input
@@ -104,6 +99,8 @@ const Register = () => {
               required
             />
           </div>
+
+          {/* Email */}
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-violet-400" />
             <input
@@ -116,6 +113,8 @@ const Register = () => {
               required
             />
           </div>
+
+          {/* Password */}
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-violet-400" />
             <input
@@ -134,6 +133,8 @@ const Register = () => {
               {showPassword ? <EyeOff /> : <Eye />}
             </button>
           </div>
+
+          {/* Submit */}
           <button
             type="submit"
             disabled={isLoading}

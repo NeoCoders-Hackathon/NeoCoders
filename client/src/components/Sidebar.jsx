@@ -17,9 +17,7 @@ const Sidebar = ({ onLogout, user }) => {
   ];
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsOpen(window.innerWidth >= 768);
-    };
+    const handleResize = () => setIsOpen(window.innerWidth >= 768);
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -38,21 +36,15 @@ const Sidebar = ({ onLogout, user }) => {
     <>
       {/* Mobile overlay */}
       {isOpen && window.innerWidth < 768 && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
-          onClick={() => setIsOpen(false)}
-        />
+        <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={() => setIsOpen(false)} />
       )}
 
       {/* Sidebar */}
       <div
-        className={`
-          fixed md:relative left-0 top-0 h-screen z-50
-          bg-gradient-to-b from-[#1e1e3f] to-[#2b2b55]
-          text-white shadow-2xl border-r border-violet-500/20
+        className={`fixed md:relative left-0 top-0 h-screen z-50
+          bg-gradient-to-b from-[#1e1e3f] to-[#2b2b55] text-white shadow-2xl border-r border-violet-500/20
           transition-all duration-300 ease-in-out
-          ${isOpen ? "w-64 translate-x-0" : "w-0 md:w-16 -translate-x-full md:translate-x-0"}
-        `}
+          ${isOpen ? "w-64 translate-x-0" : "w-0 md:w-16 -translate-x-full md:translate-x-0"}`}
       >
         {/* Header */}
         <div className="p-4 border-b border-violet-500/20 flex items-center justify-between">
@@ -66,10 +58,7 @@ const Sidebar = ({ onLogout, user }) => {
               </h1>
             </div>
           )}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="p-2 hover:bg-violet-600/20 rounded-lg transition-colors duration-200 group"
-          >
+          <button onClick={() => setIsOpen(!isOpen)} className="p-2 hover:bg-violet-600/20 rounded-lg transition-colors duration-200 group">
             {isOpen ? <X className="w-5 h-5 text-gray-300 group-hover:text-white" /> : <Menu className="w-5 h-5 text-gray-300 group-hover:text-white" />}
           </button>
         </div>
@@ -80,13 +69,15 @@ const Sidebar = ({ onLogout, user }) => {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-violet-500/50">
                 <img
-                  src={user?.image || `https://via.placeholder.com/150/6366f1/ffffff?text=${user?.name?.charAt(0) || "U"}`}
+                  src={user?.image || `https://via.placeholder.com/150/6366f1/ffffff?text=${user ? user.firstName.charAt(0) : "U"}`}
                   alt="Profile"
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white truncate">{user?.name || "User"}</p>
+                <p className="text-sm font-semibold text-white truncate">
+                  {user ? `${user.firstName} ${user.lastName}` : "User"}
+                </p>
                 <p className="text-xs text-gray-300 truncate">{user?.email || ""}</p>
                 <span className="inline-block mt-1 bg-violet-600/30 px-2 py-0.5 rounded-full text-xs text-violet-300">
                   {user?.role || "User"}
@@ -105,13 +96,9 @@ const Sidebar = ({ onLogout, user }) => {
               <button
                 key={item.id}
                 onClick={() => handleNavigation(item.path)}
-                className={`
-                  w-full flex items-center gap-3 p-3 rounded-lg transition-all duration-200
-                  ${isActive
-                    ? "bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg transform scale-105"
-                    : "text-gray-300 hover:text-white hover:bg-violet-600/20 hover:scale-105"}
-                  ${!isOpen && "justify-center"}
-                `}
+                className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all duration-200
+                  ${isActive ? "bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg transform scale-105" : "text-gray-300 hover:text-white hover:bg-violet-600/20 hover:scale-105"}
+                  ${!isOpen && "justify-center"}`}
                 title={!isOpen ? item.name : ""}
               >
                 <IconComponent className={`w-5 h-5 ${isActive ? "text-white" : ""}`} />
@@ -137,13 +124,7 @@ const Sidebar = ({ onLogout, user }) => {
       {/* Mobile Toggle */}
       <button
         onClick={() => setIsOpen(true)}
-        className={`
-          fixed top-4 left-4 z-40 md:hidden p-3
-          bg-gradient-to-br from-violet-600 to-purple-600
-          text-white rounded-lg shadow-lg
-          transition-all duration-200 hover:scale-110
-          ${isOpen ? "hidden" : "block"}
-        `}
+        className={`fixed top-4 left-4 z-40 md:hidden p-3 bg-gradient-to-br from-violet-600 to-purple-600 text-white rounded-lg shadow-lg transition-all duration-200 hover:scale-110 ${isOpen ? "hidden" : "block"}`}
       >
         <Menu className="w-5 h-5" />
       </button>
