@@ -26,8 +26,9 @@ const Header = () => {
             <span className="badge">New</span>
           </a>
         </li>
-        <li><a>Settings</a></li>
-        <li><a>Logout</a></li>
+      <li> <Link to="/">Home</Link></li>
+        <li> <Link to="/">Home</Link></li>
+       <li> <Link to="/login">Login</Link></li>
       </ul>
     </div>
   </div>
