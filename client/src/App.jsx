@@ -3,6 +3,7 @@ import { useState } from "react";
 import Profile from "./pages/Profile";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Products from "./pages/Products";
 import Notifications from "./pages/Notifications";
 import Favorites from "./pages/Favorites";
@@ -17,29 +18,35 @@ function App() {
   const handleLogin = (userData) => setUser(userData);
   const handleLogout = () => setUser(null);
 
-  if (!user) return <Login onLogin={handleLogin} />;
-
   return (
     <BrowserRouter>
-      <div className="flex min-h-screen">
-        <Sidebar user={user} onLogout={handleLogout} />
+      {!user ? (
+        <Routes>
+          <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route path="/register" element={<Register onRegister={handleLogin} />} />
+          <Route path="*" element={<Navigate to="/login" />} />
+        </Routes>
+      ) : (
+        <div className="flex min-h-screen">
+          <Sidebar user={user} onLogout={handleLogout} />
 
-        <div className="flex-1 flex flex-col min-w-0">
-          <Header user={user} onLogout={handleLogout} />
+          <div className="flex-1 flex flex-col min-w-0">
+            <Header user={user} onLogout={handleLogout} />
 
-          <main className="flex-1 overflow-auto p-4 bg-gray-100 dark:bg-gray-900">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/notifications" element={<Notifications />} />
-              <Route path="/favorites" element={<Favorites />} />
-              <Route path="/orders" element={<Orders />} />
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-          </main>
+            <main className="flex-1 overflow-auto p-4 bg-gray-100 dark:bg-gray-900">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/products" element={<Products />} />
+                <Route path="/notifications" element={<Notifications />} />
+                <Route path="/favorites" element={<Favorites />} />
+                <Route path="/orders" element={<Orders />} />
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </main>
+          </div>
         </div>
-      </div>
+      )}
     </BrowserRouter>
   );
 }

@@ -4,11 +4,12 @@ import { Pencil, Trash, Plus } from 'lucide-react';
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [currentProduct, setCurrentProduct] = useState(null); // edit uchun
+  const [currentProduct, setCurrentProduct] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    price: ''
+    price: '',
+    image: '' // rasm uchun
   });
 
   // LocalStorage'dan yuklash
@@ -21,53 +22,55 @@ const Products = () => {
     localStorage.setItem('products', JSON.stringify(updatedProducts));
   };
 
-  // Form input handle
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Add yoki Edit product
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, image: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSaveProduct = () => {
     if (!formData.title.trim()) return;
 
     if (currentProduct) {
-      // Edit
       const updatedProducts = products.map(p =>
         p.id === currentProduct.id ? { ...p, ...formData } : p
       );
       setProducts(updatedProducts);
       saveToLocalStorage(updatedProducts);
     } else {
-      // Add
-      const newProduct = {
-        id: Date.now(),
-        ...formData
-      };
+      const newProduct = { id: Date.now(), ...formData };
       const updatedProducts = [...products, newProduct];
       setProducts(updatedProducts);
       saveToLocalStorage(updatedProducts);
     }
 
-    // Formni tozalash
-    setFormData({ title: '', description: '', price: '' });
+    setFormData({ title: '', description: '', price: '', image: '' });
     setCurrentProduct(null);
     setIsDrawerOpen(false);
   };
 
-  // Delete product
   const handleDeleteProduct = (id) => {
     const updatedProducts = products.filter(p => p.id !== id);
     setProducts(updatedProducts);
     saveToLocalStorage(updatedProducts);
   };
 
-  // Edit button
   const handleEditProduct = (product) => {
     setCurrentProduct(product);
     setFormData({
       title: product.title,
       description: product.description,
-      price: product.price
+      price: product.price,
+      image: product.image || ''
     });
     setIsDrawerOpen(true);
   };
@@ -79,7 +82,7 @@ const Products = () => {
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold">Products</h1>
           <button
-            onClick={() => { setCurrentProduct(null); setFormData({ title:'', description:'', price:'' }); setIsDrawerOpen(true); }}
+            onClick={() => { setCurrentProduct(null); setFormData({ title:'', description:'', price:'', image:'' }); setIsDrawerOpen(true); }}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition"
           >
             <Plus className="w-4 h-4" /> Add Product
@@ -89,15 +92,16 @@ const Products = () => {
         {products.length === 0 ? (
           <p>No products added yet.</p>
         ) : (
-          <ul className="space-y-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {products.map(product => (
-              <li key={product.id} className="flex justify-between items-center p-3 border border-gray-300 rounded shadow-sm">
-                <div>
-                  <h2 className="font-semibold">{product.title}</h2>
-                  <p className="text-gray-600">{product.description}</p>
-                  <p className="text-gray-700 font-medium">${product.price}</p>
-                </div>
-                <div className="flex gap-2">
+              <div key={product.id} className="border border-gray-300 rounded shadow-lg p-4 bg-white flex flex-col">
+                {product.image && (
+                  <img src={product.image} alt={product.title} className="w-full h-40 object-cover rounded mb-3" />
+                )}
+                <h2 className="font-semibold text-lg">{product.title}</h2>
+                <p className="text-gray-600 mb-2">{product.description}</p>
+                <p className="text-gray-800 font-medium mb-3">${product.price}</p>
+                <div className="flex gap-2 mt-auto">
                   <button
                     onClick={() => handleEditProduct(product)}
                     className="px-2 py-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded flex items-center gap-1"
@@ -111,9 +115,9 @@ const Products = () => {
                     <Trash className="w-4 h-4" /> Delete
                   </button>
                 </div>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
 
@@ -124,12 +128,12 @@ const Products = () => {
         <div className="space-y-4">
           <div>
             <label className="block mb-1">Title</label>
-            <input
+            <input placeholder='Title product'
               type="text"
               name="title"
               value={formData.title}
               onChange={handleInputChange}
-              className="w-full p-2 rounded text-black"
+              className="w-full p-2 rounded border border-gray-300 text-white"
             />
           </div>
           <div>
@@ -138,7 +142,7 @@ const Products = () => {
               name="description"
               value={formData.description}
               onChange={handleInputChange}
-              className="w-full p-2 rounded text-black"
+              className="w-full p-2 rounded  border border-gray-300 text-white" placeholder='description product'
             ></textarea>
           </div>
           <div>
@@ -148,7 +152,16 @@ const Products = () => {
               name="price"
               value={formData.price}
               onChange={handleInputChange}
-              className="w-full p-2 rounded text-black"
+              className="w-full p-2 rounded text-white border border-gray-300 " placeholder='price product'
+            />
+          </div>
+          <div>
+            <label className="block mb-1">Image</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full text-white border border-gray-300 rounded p-2"
             />
           </div>
 
