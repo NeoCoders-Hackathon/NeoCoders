@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { User, Mail, Lock, Eye, EyeOff, AlertCircle, Sparkles, Shield, UserPlus } from "lucide-react";
+import { User, Mail, Lock, Eye, EyeOff, AlertCircle, Sparkles, Shield, UserPlus, Phone } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -9,21 +9,24 @@ const Register = ({ onRegister }) => {
     firstName: "",
     lastName: "",
     email: "",
+    phone: "",
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // 🔹 Inputlarni yangilash
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (error) setError("");
   };
 
+  // 🔹 Form yuborilganda
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone || !formData.password) {
       setError("All fields are required");
       return;
     }
@@ -36,19 +39,20 @@ const Register = ({ onRegister }) => {
     try {
       const res = await axios.post("http://192.168.100.85:5000/api/auth/register/user", formData);
 
-      if (res.data.token) localStorage.setItem("token", res.data.token);
       if (res.data.user) {
-        localStorage.setItem("user", JSON.stringify(res.data.user));
-        onRegister && onRegister(res.data.user); // App.jsx user state-ni yangilash
+        // 🔹 Backenddan qaytgan userni to‘liq yuboramiz (phone va createdAt ham)
+        onRegister && onRegister(res.data.user);
       }
 
-      navigate("/"); // Home yoki Profile
+      // 🔹 Registerdan keyin Login page ga o'tkazish
+      navigate("/login");
     } catch (err) {
       setError(err.response?.data?.message || "Server error");
     } finally {
       setIsLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4 relative overflow-hidden">
@@ -57,22 +61,6 @@ const Register = ({ onRegister }) => {
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
-      </div>
-
-      {/* Floating Particles */}
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-white/20 rounded-full animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 2}s`
-            }}
-          ></div>
-        ))}
       </div>
 
       <div className="max-w-md w-full relative z-10">
@@ -145,6 +133,21 @@ const Register = ({ onRegister }) => {
               </div>
             </div>
 
+            {/* Phone */}
+            <div className="group relative">
+              <div className="relative">
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-400" />
+                <input
+                  type="text"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="Phone Number"
+                  className="w-full pl-12 pr-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-purple-400 focus:bg-white/15 transition-all duration-300"
+                />
+              </div>
+            </div>
+
             {/* Password */}
             <div className="group relative">
               <div className="relative">
@@ -197,8 +200,6 @@ const Register = ({ onRegister }) => {
             <span>Your information is secure and encrypted</span>
           </div>
         </div>
-
-        {/* Bottom Glow */}
         <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-3/4 h-6 bg-gradient-to-r from-purple-500/30 via-blue-500/30 to-purple-500/30 blur-xl rounded-full"></div>
       </div>
     </div>

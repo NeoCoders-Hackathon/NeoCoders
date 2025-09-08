@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Pencil, X, User, Camera, Save } from "lucide-react";
+import { Pencil, X, User, Camera, Save, Phone, Mail } from "lucide-react";
 
 const Profile = ({ user: appUser }) => {
   const [user, setUser] = useState(appUser || {});
@@ -172,12 +172,22 @@ const Profile = ({ user: appUser }) => {
         {/* Non-editable info */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="bg-gray-700/30 rounded-xl p-4">
-            <p className="text-gray-400 text-sm">Email</p>
+            <p className="text-gray-400 text-sm flex items-center gap-2"><Mail className="w-4 h-4" /> Email</p>
             <p className="text-white font-medium">{user.email}</p>
+          </div>
+          <div className="bg-gray-700/30 rounded-xl p-4">
+            <p className="text-gray-400 text-sm">Phone</p>
+            <p className="text-white font-medium">{user.phone || "—"}</p>
           </div>
           <div className="bg-gray-700/30 rounded-xl p-4">
             <p className="text-gray-400 text-sm">Role</p>
             <p className="text-white font-medium">{user.role}</p>
+          </div>
+          <div className="bg-gray-700/30 rounded-xl p-4">
+            <p className="text-gray-400 text-sm">Joined</p>
+            <p className="text-white font-medium">
+              {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "—"}
+            </p>
           </div>
         </div>
       </div>
