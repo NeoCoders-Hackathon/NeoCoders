@@ -132,7 +132,7 @@ const Profile = ({ user: appUser }) => {
 
         {/* Bio */}
         <div className="mb-8">
-          <label className="block text-gray-300 text-sm font-medium mb-2 flex items-center gap-2">
+          <label className=" text-gray-300 text-sm font-medium mb-2 flex items-center gap-2">
             <User className="w-4 h-4" /> Bio
           </label>
           {isEditing ? (
